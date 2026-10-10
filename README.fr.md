@@ -4,7 +4,7 @@ Madabina CLI est un logiciel propriétaire distribué par Madabina LLC. Ce dép�
 
 ## État des releases
 
-Aucune release publique versionnée n’est disponible pour le moment. N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
+Aucune release publique versionnée n’est disponible pour le moment. Les téléchargements officiels seront publiés sur la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
 
 Lorsqu’une version officielle sera publiée, ses archives, paquets Debian et manifeste SHA-256 seront joints à la release. Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
 
