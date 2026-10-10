@@ -1,0 +1,11 @@
+# This repository contains release documentation and notices only.
+# Publish versioned archives and packages as GitHub Release assets, not Git blobs.
+*
+!.gitignore
+!README.md
+!README.fr.md
+!README.ar.md
+!LICENSE
+!THIRD_PARTY_NOTICES.md
+!third_party_licenses/
+!third_party_licenses/**

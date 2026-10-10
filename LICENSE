@@ -1,0 +1,63 @@
+MADABINA CLI PROPRIETARY BINARY REDISTRIBUTION LICENSE
+Version 1.0, October 10, 2026
+
+Copyright (c) 2026 Madabina LLC. All rights reserved.
+
+This license applies to the Madabina CLI executable binaries distributed by
+Madabina LLC (the "Software"). It does not apply to third-party components, which
+remain subject to their respective license terms and notices.
+
+1. License grant
+
+Madabina LLC grants you a worldwide, non-exclusive, royalty-free license to install
+and run the unmodified Software and to redistribute exact, unmodified copies
+of the Software in binary form, subject to this license.
+
+2. Redistribution conditions
+
+When redistributing the Software, you must:
+
+ a. redistribute only the original, unmodified binary as supplied by Madabina LLC;
+ b. include this license and preserve all copyright, attribution, and other
+    notices supplied with the Software; and
+ c. make clear that your redistribution is not an official Madabina release,
+    unless Madabina LLC has authorized you to represent it as one.
+
+You may redistribute the Software only without charge for the Software itself.
+This license does not grant you the right to provide paid support, warranties,
+or services on behalf of Madabina LLC or to use Madabina's trademarks except to
+identify the Software. Madabina LLC may grant additional rights in writing.
+
+3. Restrictions
+
+You may not redistribute the Software's source code under this license, modify,
+adapt, translate, or create derivative works of the Software, or redistribute
+modified binaries. You may not remove or alter notices in the Software. No
+rights are granted to Madabina names, logos, or trademarks beyond the limited
+identification right in Section 2(c).
+
+4. Third-party components
+
+The Software may include third-party components governed by separate licenses.
+Those licenses apply to their respective components and may grant additional
+rights or require separate notices. You must comply with those licenses when
+redistributing the Software.
+
+5. Termination
+
+This license terminates automatically if you materially violate its terms. Upon
+termination, you must stop using and redistributing the Software. Rights of
+recipients who received compliant copies before termination are not affected.
+
+6. Disclaimer
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT, TO THE MAXIMUM EXTENT PERMITTED BY
+APPLICABLE LAW. TO THE MAXIMUM EXTENT PERMITTED BY LAW, MADABINA LLC WILL NOT BE
+LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE SOFTWARE OR
+ITS USE.
+
+7. Reservation of rights
+
+All rights not expressly granted in this license are reserved by Madabina LLC.
