@@ -10,7 +10,6 @@ const platformPackages = {
   'linux-arm64': 'madabina-cli-linux-arm64',
   'darwin-x64': 'madabina-cli-darwin-x64',
   'darwin-arm64': 'madabina-cli-darwin-arm64',
-  'win32-x64': 'madabina-cli-win32-x64',
   'win32-arm64': 'madabina-cli-win32-arm64',
 };
 
@@ -19,7 +18,7 @@ const packageName = platformPackages[key];
 
 if (!packageName) {
   console.error(`Madabina CLI does not provide an npm binary for ${key}.`);
-  console.error('Supported targets: Windows, Linux, and macOS x64/ARM64.');
+  console.error('Available npm binaries: Linux and macOS x64/ARM64, and Windows ARM64.');
   process.exit(1);
 }
 

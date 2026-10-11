@@ -24,6 +24,7 @@ TARGETS = {
     "win32-x64": ("win32", "x64", "amd64", "zip", "madabina.exe"),
     "win32-arm64": ("win32", "arm64", "arm64", "zip", "madabina.exe"),
 }
+LAUNCHER_TARGETS = tuple(target for target in TARGETS if target != "win32-x64")
 
 
 def checked_version(value: str) -> str:
@@ -161,7 +162,7 @@ def stage_launcher(version: str, output: Path) -> Path:
         "bin": {"madabina": "bin/madabina.js"},
         "files": ["bin/madabina.js", "LICENSE", "THIRD_PARTY_NOTICES.md", "README.md"],
         "optionalDependencies": {
-            f"madabina-cli-{target}": version for target in TARGETS
+            f"madabina-cli-{target}": version for target in LAUNCHER_TARGETS
         },
     }
     (package_dir / "package.json").write_text(

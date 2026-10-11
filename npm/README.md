@@ -4,7 +4,8 @@ The public npm package is a launcher for the original, unmodified Madabina CLI
 binary. It does not contain or publish the Go source code. Platform packages
 are assembled only from checksum-verified assets attached to an official
 GitHub Release; the Madabina license and third-party notices travel with each
-binary package.
+binary package. Windows x64 is temporarily unavailable from npm while npm
+reviews the package name; Windows ARM64 remains available.
 
 ## User installation
 
@@ -15,9 +16,8 @@ npm install --global madabina-cli
 madabina --version
 ```
 
-Requires Node.js/npm. The installer chooses Windows, Linux, or macOS and x64 or
-ARM64 through npm's `os` and `cpu` package fields. Termux/Android is not
-included.
+Requires Node.js/npm. Available binaries are Linux and macOS x64/ARM64 and
+Windows ARM64. Termux/Android is not included.
 
 ## Publisher setup
 
@@ -30,7 +30,7 @@ included.
    packages** from GitHub Actions with its tag, such as `v0.1.1`. The binary
    release is currently created with `GITHUB_TOKEN`, so its `release: published`
    event does not reliably start another workflow. The npm workflow validates
-   each archive against that release's `checksums.txt`, publishes the six
+   each archive against that release's `checksums.txt`, publishes the available
    platform packages, then publishes `madabina-cli`.
 5. Confirm the package versions on npm, then install on one machine for each
    target platform before announcing availability.

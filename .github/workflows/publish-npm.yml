@@ -9,12 +9,18 @@ on:
         description: Existing GitHub Release tag (for example v0.1.1)
         required: true
         type: string
+      skip_platforms:
+        description: Skip platform packages already staged for npm review
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
 
 jobs:
   publish-platform:
+    if: ${{ !inputs.skip_platforms }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -28,8 +34,6 @@ jobs:
             asset: madabina_{version}_darwin_amd64.tar.gz
           - target: darwin-arm64
             asset: madabina_{version}_darwin_arm64.tar.gz
-          - target: win32-x64
-            asset: madabina_{version}_windows_amd64.zip
           - target: win32-arm64
             asset: madabina_{version}_windows_arm64.zip
     steps:
@@ -84,6 +88,7 @@ jobs:
 
   publish-launcher:
     needs: publish-platform
+    if: ${{ always() && (needs.publish-platform.result == 'success' || (github.event_name == 'workflow_dispatch' && inputs.skip_platforms)) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
