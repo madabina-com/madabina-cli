@@ -1,0 +1,69 @@
+name: Build Windows installers
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub Release tag (for example v0.1.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-installers-${{ inputs.tag || github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Confirm NSIS is available
+        shell: pwsh
+        run: |
+          $makensis = Get-Command makensis.exe -ErrorAction SilentlyContinue
+          if (-not $makensis) {
+            $candidate = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
+            if (Test-Path -LiteralPath $candidate) {
+              $nsisDirectory = Split-Path -Parent $candidate
+              $nsisDirectory | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+              $env:PATH = "$nsisDirectory;$env:PATH"
+            }
+          }
+          $version = (& makensis.exe /VERSION).Trim()
+          if ($LASTEXITCODE -ne 0 -or $version -notmatch '^v?3\.') { throw "Expected NSIS 3.x; found '$version'." }
+          Write-Host "Using NSIS $version with the installer's zlib compressor."
+      - name: Build per-user installers and checksums
+        id: build
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+        run: |
+          ./scripts/build-windows-installers.ps1 -Tag $env:RELEASE_TAG
+          "version=$($env:RELEASE_TAG.TrimStart('v'))" >> $env:GITHUB_OUTPUT
+      - name: Attach installers to the existing release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+        run: |
+          gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { throw "Release $env:RELEASE_TAG does not exist." }
+          $assets = @(
+            "build/windows-installers/$($env:RELEASE_TAG.TrimStart('v'))/madabina_$($env:RELEASE_TAG.TrimStart('v'))_windows_amd64_setup.exe",
+            "build/windows-installers/$($env:RELEASE_TAG.TrimStart('v'))/madabina_$($env:RELEASE_TAG.TrimStart('v'))_windows_arm64_setup.exe",
+            "build/windows-installers/$($env:RELEASE_TAG.TrimStart('v'))/checksums.txt"
+          )
+          gh release upload $env:RELEASE_TAG @assets --clobber --repo $env:GITHUB_REPOSITORY
+          if ($LASTEXITCODE -ne 0) { throw 'Could not attach Windows installers to the release.' }
+      - name: Upload the generated WinGet manifest set
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: winget-manifests-${{ steps.build.outputs.version }}
+          path: build/windows-installers/${{ steps.build.outputs.version }}/winget-manifests/
+          if-no-files-found: error

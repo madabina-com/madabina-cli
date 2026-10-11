@@ -12,6 +12,11 @@
 !.github/workflows/
 !.github/workflows/publish-binary-release.yml
 !.github/workflows/publish-apt-repository.yml
+!.github/workflows/windows-installers.yml
+!scripts/
+!scripts/**
+!packaging/
+!packaging/**
 !apt/
 !apt/**
 !release-assets/

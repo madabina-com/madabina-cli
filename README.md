@@ -8,6 +8,24 @@ Madabina CLI `v0.1.0` is the first official binary release. Download the version
 
 The Linux installer was not validated on an actual Linux runtime for this release. See the release notes before installing. Do not install or redistribute files marked `SNAPSHOT`; they are local validation candidates, not official releases.
 
+## Windows installation
+
+Per-user setup installers for Windows x64 and ARM64 are being attached to v0.1.0. Once the `*_setup.exe` files appear on the release page, use PowerShell to download the installer and checksum manifest, verify SHA-256, and launch it:
+
+```powershell
+$version = '0.1.0'; $arch = 'amd64' # use 'arm64' for Windows ARM64
+$name = "madabina_${version}_windows_${arch}_setup.exe"
+$base = "https://github.com/madabina-com/madabina-cli/releases/download/v$version"
+$checksums = Join-Path $env:TEMP 'madabina-checksums.txt'; $installer = Join-Path $env:TEMP $name
+curl.exe --fail --location --silent --show-error "$base/checksums.txt" --output $checksums; if ($LASTEXITCODE -ne 0) { throw 'Checksum download failed' }
+curl.exe --fail --location --silent --show-error "$base/$name" --output $installer; if ($LASTEXITCODE -ne 0) { throw 'Installer download failed' }
+$expected = ([regex]::Match((Get-Content -Raw $checksums), "(?m)^([0-9a-fA-F]{64})\s+\*?$([regex]::Escape($name))\s*$")).Groups[1].Value
+if (-not $expected -or (Get-FileHash $installer -Algorithm SHA256).Hash -ne $expected) { throw 'SHA-256 verification failed' }
+Start-Process $installer -Wait
+```
+
+The installer uses the current user's local programs directory, updates the user's `PATH`, preserves the CLI license and third-party notices, and does not require administrator rights. The community WinGet manifest is prepared by the release workflow but has not yet been submitted or merged; `winget install Madabina.MadabinaCLI` is not available yet. A checksum served with the same HTTPS release verifies transfer integrity but does not independently authenticate the publisher.
+
 ## License and notices
 
 The Madabina CLI license permits use and free redistribution of the original, unmodified binaries only, subject to the included license. It does not grant rights to redistribute source code or modified binaries. Resale requires separate written permission from Madabina LLC. See [LICENSE](LICENSE) and the [third-party notices](THIRD_PARTY_NOTICES.md).

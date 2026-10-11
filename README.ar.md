@@ -8,6 +8,24 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 لم يتم اختبار مُثبّت Linux على بيئة Linux فعلية لهذا الإصدار. راجع ملاحظات الإصدار قبل التثبيت. لا تثبّت ولا تعِد توزيع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات محلية للاختبار وليست إصدارات رسمية.
 
+## التثبيت على Windows
+
+يجري إرفاق مُثبّتَي المستخدم لنظام Windows بمعماريتي x64 وARM64 بإصدار v0.1.0. بعد ظهور ملفي `*_setup.exe` في صفحة الإصدار، استخدم PowerShell لتنزيل المُثبّت وملف checksums والتحقق من SHA-256 ثم تشغيله:
+
+```powershell
+$version = '0.1.0'; $arch = 'amd64' # استخدم 'arm64' لأجهزة Windows ARM64
+$name = "madabina_${version}_windows_${arch}_setup.exe"
+$base = "https://github.com/madabina-com/madabina-cli/releases/download/v$version"
+$checksums = Join-Path $env:TEMP 'madabina-checksums.txt'; $installer = Join-Path $env:TEMP $name
+curl.exe --fail --location --silent --show-error "$base/checksums.txt" --output $checksums; if ($LASTEXITCODE -ne 0) { throw 'فشل تنزيل ملف checksums' }
+curl.exe --fail --location --silent --show-error "$base/$name" --output $installer; if ($LASTEXITCODE -ne 0) { throw 'فشل تنزيل المُثبّت' }
+$expected = ([regex]::Match((Get-Content -Raw $checksums), "(?m)^([0-9a-fA-F]{64})\s+\*?$([regex]::Escape($name))\s*$")).Groups[1].Value
+if (-not $expected -or (Get-FileHash $installer -Algorithm SHA256).Hash -ne $expected) { throw 'فشل التحقق من SHA-256' }
+Start-Process $installer -Wait
+```
+
+يثبّت البرنامج في مجلد البرامج المحلي للمستخدم، ويحدّث `PATH` الخاص به، ويحافظ على الترخيص وإشعارات المكونات الخارجية، ولا يحتاج إلى صلاحيات المدير. يُعدّ سير العمل بيان WinGet المجتمعي، لكنه لم يُقدّم أو يُدمج بعد؛ لذلك فإن `winget install Madabina.MadabinaCLI` غير متاح حالياً. تتحقق بصمة checksums المنشورة مع الإصدار نفسه عبر HTTPS من سلامة النقل، لكنها لا توثّق الناشر بشكل مستقل.
+
 ## الترخيص والإشعارات
 
 يسمح ترخيص Madabina CLI بالاستخدام وإعادة التوزيع المجاني للملفات التنفيذية الأصلية غير المعدّلة، وفقاً لشروط الترخيص المرفق. ولا يسمح بإعادة توزيع الشيفرة المصدرية أو الملفات التنفيذية المعدّلة. تتطلب إعادة البيع إذناً كتابياً منفصلاً من Madabina LLC. راجع [الترخيص](LICENSE) و[إشعارات المكونات الخارجية](THIRD_PARTY_NOTICES.md).
