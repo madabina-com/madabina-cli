@@ -1,6 +1,12 @@
 name: Build Windows installers
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/windows-installers.yml
+      - packaging/windows/**
+      - scripts/build-windows-installers.ps1
   release:
     types: [published]
   workflow_dispatch:
@@ -42,15 +48,27 @@ jobs:
         id: build
         shell: pwsh
         env:
-          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
+          DISPATCH_TAG: ${{ inputs.tag }}
         run: |
-          ./scripts/build-windows-installers.ps1 -Tag $env:RELEASE_TAG
-          "version=$($env:RELEASE_TAG.TrimStart('v'))" >> $env:GITHUB_OUTPUT
+          $tag = $env:DISPATCH_TAG
+          if (-not $tag) { $tag = $env:RELEASE_EVENT_TAG }
+          if (-not $tag) {
+            $releases = gh release list --repo $env:GITHUB_REPOSITORY --limit 100 --json tagName,isDraft,isPrerelease | ConvertFrom-Json
+            if ($LASTEXITCODE -ne 0) { throw 'Could not list published releases.' }
+            $stable = $releases | Where-Object { -not $_.isDraft -and -not $_.isPrerelease -and $_.tagName -match '^v\d+\.\d+\.\d+$' } | Sort-Object { [version]$_.tagName.TrimStart('v') } -Descending
+            $tag = ($stable | Select-Object -First 1).tagName
+          }
+          if (-not $tag) { throw 'No stable release tag was selected.' }
+          ./scripts/build-windows-installers.ps1 -Tag $tag
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "version=$($tag.TrimStart('v'))" >> $env:GITHUB_OUTPUT
       - name: Attach installers to the existing release
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+          RELEASE_TAG: ${{ steps.build.outputs.tag }}
         run: |
           gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY
           if ($LASTEXITCODE -ne 0) { throw "Release $env:RELEASE_TAG does not exist." }
