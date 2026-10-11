@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - apt/install.sh
+      - scripts/install-windows.ps1
       - .github/workflows/publish-apt-repository.yml
   release:
     types: [published]
@@ -133,7 +134,10 @@ jobs:
           printf '%s\n' "$fingerprint" > apt-key-fingerprint.txt
           cp "$GITHUB_WORKSPACE/apt/install.sh" install.sh
           sha256sum install.sh | awk '{ print $1 "  madabina-install.sh" }' > install.sh.sha256
-          printf '%s\n' "Madabina CLI APT repository, package version ${VERSION}. Installer: https://packages.madabina.com/install.sh (SHA-256 manifest: install.sh.sha256)." > index.html
+          cp "$GITHUB_WORKSPACE/scripts/install-windows.ps1" install-windows.ps1
+          sha256sum install-windows.ps1 | awk '{ print $1 "  madabina-install-windows.ps1" }' > install-windows.ps1.sha256
+          printf '%s\n' "$VERSION" > latest-version.txt
+          printf '%s\n' "Madabina CLI package repository, latest version ${VERSION}. Debian/Ubuntu installer: https://packages.madabina.com/install.sh. Windows PowerShell installer: https://packages.madabina.com/install-windows.ps1. Each installer has a SHA-256 manifest." > index.html
           echo "APT repository metadata signed with fingerprint $fingerprint"
 
       - name: Configure GitHub Pages

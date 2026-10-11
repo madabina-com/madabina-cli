@@ -1,15 +1,26 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)]
     [ValidatePattern('^\d+\.\d+\.\d+$')]
     [string] $Version,
 
-    [Parameter(Mandatory)]
     [ValidateSet('x64', 'arm64')]
     [string] $Architecture
 )
 
 $ErrorActionPreference = 'Stop'
+
+if (-not $Version) {
+    $Version = (Invoke-RestMethod -Uri 'https://packages.madabina.com/latest-version.txt').Trim()
+    if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "The published latest stable version is invalid: '$Version'." }
+}
+
+if (-not $Architecture) {
+    $nativeArchitecture = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+    if ($nativeArchitecture -match '^(AMD64|X64)$') { $Architecture = 'x64' }
+    elseif ($nativeArchitecture -eq 'ARM64') { $Architecture = 'arm64' }
+    else { throw "Unsupported Windows architecture: '$nativeArchitecture'. Supported architectures are x64 and ARM64." }
+}
+
 $assetArch = if ($Architecture -eq 'x64') { 'amd64' } else { 'arm64' }
 $asset = "madabina_${Version}_windows_${assetArch}_setup.exe"
 $baseUrl = "https://github.com/madabina-com/madabina-cli/releases/download/v$Version"

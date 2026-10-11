@@ -10,7 +10,21 @@ L’installateur Linux n’a pas été validé sur un véritable environnement L
 
 ## Installation Windows
 
-Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.1.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0). Utilisez PowerShell pour télécharger l’installateur et le manifeste de checksums, vérifier SHA-256, puis le lancer :
+Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.1.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0).
+
+### Installation en une commande
+
+Ouvrez PowerShell et collez cette commande. Elle télécharge et vérifie le script d’installation, sélectionne la dernière release stable et l’architecture Windows, vérifie le setup avec le checksum de la release, puis lance l’installation utilisateur :
+
+```powershell
+$d=Join-Path $env:TEMP ('madabina-'+[guid]::NewGuid().ToString('N'));New-Item -ItemType Directory -Path $d|Out-Null;try{$s=Join-Path $d 'madabina-install-windows.ps1';$m=Join-Path $d 'install-windows.ps1.sha256';curl.exe -fsSL https://packages.madabina.com/install-windows.ps1 -o $s;if($LASTEXITCODE -ne 0){throw 'Échec du téléchargement du script'};curl.exe -fsSL https://packages.madabina.com/install-windows.ps1.sha256 -o $m;if($LASTEXITCODE -ne 0){throw 'Échec du téléchargement du checksum'};$e=[regex]::Match((Get-Content -Raw $m),'(?m)^([0-9a-fA-F]{64})\s+madabina-install-windows\.ps1\s*$').Groups[1].Value;$a=(Get-FileHash -LiteralPath $s -Algorithm SHA256).Hash;if(-not $e -or $a -ne $e){throw 'Échec de la vérification SHA-256 du script'};powershell.exe -NoProfile -ExecutionPolicy Bypass -File $s;if($LASTEXITCODE -ne 0){throw "L’installation a échoué, code $LASTEXITCODE"}}finally{Remove-Item -LiteralPath $d -Recurse -Force -ErrorAction SilentlyContinue}
+```
+
+Le manifeste SHA-256 est hébergé sur le même domaine HTTPS : il détecte les erreurs de transfert, mais n’authentifie pas indépendamment l’éditeur du script.
+
+### Téléchargement et vérification manuels
+
+Pour télécharger le setup vous-même, choisissez `amd64` pour Windows x64 ou `arm64` pour Windows ARM64, vérifiez son hash dans `checksums.txt`, puis lancez-le :
 
 ```powershell
 $version = '0.1.0'; $arch = 'amd64' # utiliser 'arm64' pour Windows ARM64

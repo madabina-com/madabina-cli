@@ -10,7 +10,21 @@ The Linux installer was not validated on an actual Linux runtime for this releas
 
 ## Windows installation
 
-Per-user setup installers for Windows x64 and ARM64 are available on the [v0.1.0 release page](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0). Use PowerShell to download the installer and checksum manifest, verify SHA-256, and launch it:
+Per-user setup installers for Windows x64 and ARM64 are available on the [v0.1.0 release page](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0).
+
+### One-command installer
+
+Open PowerShell and paste this one-line command. It downloads and verifies the bootstrap script, selects the latest stable release and your Windows architecture, verifies the setup executable against the release checksum, and starts the per-user installer:
+
+```powershell
+$d=Join-Path $env:TEMP ('madabina-'+[guid]::NewGuid().ToString('N'));New-Item -ItemType Directory -Path $d|Out-Null;try{$s=Join-Path $d 'madabina-install-windows.ps1';$m=Join-Path $d 'install-windows.ps1.sha256';curl.exe -fsSL https://packages.madabina.com/install-windows.ps1 -o $s;if($LASTEXITCODE -ne 0){throw 'Script download failed'};curl.exe -fsSL https://packages.madabina.com/install-windows.ps1.sha256 -o $m;if($LASTEXITCODE -ne 0){throw 'Checksum download failed'};$e=[regex]::Match((Get-Content -Raw $m),'(?m)^([0-9a-fA-F]{64})\s+madabina-install-windows\.ps1\s*$').Groups[1].Value;$a=(Get-FileHash -LiteralPath $s -Algorithm SHA256).Hash;if(-not $e -or $a -ne $e){throw 'Bootstrap SHA-256 verification failed'};powershell.exe -NoProfile -ExecutionPolicy Bypass -File $s;if($LASTEXITCODE -ne 0){throw "Installer failed with code $LASTEXITCODE"}}finally{Remove-Item -LiteralPath $d -Recurse -Force -ErrorAction SilentlyContinue}
+```
+
+The SHA-256 manifest is hosted on the same HTTPS domain, so it detects transfer errors but does not independently authenticate the bootstrap publisher.
+
+### Manual download and verification
+
+To download the setup yourself, choose `amd64` for Windows x64 or `arm64` for Windows ARM64, verify its hash against `checksums.txt`, then launch it:
 
 ```powershell
 $version = '0.1.0'; $arch = 'amd64' # use 'arm64' for Windows ARM64

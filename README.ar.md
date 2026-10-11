@@ -10,7 +10,21 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 ## التثبيت على Windows
 
-يجري إرفاق مُثبّتَي المستخدم لنظام Windows بمعماريتي x64 وARM64 بإصدار v0.1.0. بعد ظهور ملفي `*_setup.exe` في صفحة الإصدار، استخدم PowerShell لتنزيل المُثبّت وملف checksums والتحقق من SHA-256 ثم تشغيله:
+تتوفر مُثبّتات المستخدم لنظام Windows بمعماريتي x64 وARM64 في [صفحة الإصدار v0.1.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0).
+
+### التثبيت بأمر واحد
+
+افتح PowerShell والصق هذا الأمر. ينزّل البرنامج النصي الأولي ويتحقق من SHA-256، ثم يختار أحدث إصدار مستقر ومعمارية Windows، ويتحقق من ملف التثبيت باستخدام checksums الخاصة بالإصدار، ثم يبدأ التثبيت للمستخدم الحالي:
+
+```powershell
+$d=Join-Path $env:TEMP ('madabina-'+[guid]::NewGuid().ToString('N'));New-Item -ItemType Directory -Path $d|Out-Null;try{$s=Join-Path $d 'madabina-install-windows.ps1';$m=Join-Path $d 'install-windows.ps1.sha256';curl.exe -fsSL https://packages.madabina.com/install-windows.ps1 -o $s;if($LASTEXITCODE -ne 0){throw 'فشل تنزيل البرنامج النصي'};curl.exe -fsSL https://packages.madabina.com/install-windows.ps1.sha256 -o $m;if($LASTEXITCODE -ne 0){throw 'فشل تنزيل checksum'};$e=[regex]::Match((Get-Content -Raw $m),'(?m)^([0-9a-fA-F]{64})\s+madabina-install-windows\.ps1\s*$').Groups[1].Value;$a=(Get-FileHash -LiteralPath $s -Algorithm SHA256).Hash;if(-not $e -or $a -ne $e){throw 'فشل التحقق من SHA-256 للبرنامج النصي'};powershell.exe -NoProfile -ExecutionPolicy Bypass -File $s;if($LASTEXITCODE -ne 0){throw "فشل التثبيت، الرمز $LASTEXITCODE"}}finally{Remove-Item -LiteralPath $d -Recurse -Force -ErrorAction SilentlyContinue}
+```
+
+يتم استضافة ملف SHA-256 على نطاق HTTPS نفسه؛ فهو يكشف أخطاء النقل لكنه لا يثبت هوية ناشر البرنامج النصي بشكل مستقل.
+
+### التنزيل والتحقق يدوياً
+
+لتنزيل ملف التثبيت بنفسك، اختر `amd64` لنظام Windows x64 أو `arm64` لنظام Windows ARM64، وتحقق من قيمته في `checksums.txt` ثم شغّله:
 
 ```powershell
 $version = '0.1.0'; $arch = 'amd64' # استخدم 'arm64' لأجهزة Windows ARM64
