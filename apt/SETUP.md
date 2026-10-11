@@ -1,6 +1,6 @@
 # APT repository setup
 
-The `publish-apt-repository.yml` workflow publishes Debian packages from each stable GitHub Release to GitHub Pages. It verifies release checksums, validates package name/version/architecture, creates separate AMD64 and ARM64 indexes, and signs repository metadata. It does not build or alter the proprietary CLI binaries.
+The `publish-apt-repository.yml` workflow publishes Debian packages from each stable GitHub Release to GitHub Pages. It verifies release checksums, validates package name/version/architecture, creates separate AMD64 and ARM64 indexes, signs repository metadata, and publishes `install.sh` with a SHA-256 manifest. A push that changes the installer or this workflow republishes the latest stable release. It does not build or alter the proprietary CLI binaries.
 
 ## One-time GitHub configuration
 
@@ -19,8 +19,8 @@ The `publish-apt-repository.yml` workflow publishes Debian packages from each st
 
 3. In **Settings → Pages**, set the publishing source to **GitHub Actions**.
 
-4. Push this workflow and `apt/release.conf` to `main`. Then go to **Actions → Publish APT repository → Run workflow**, enter `v0.1.0`, and run it once to publish the current release. Future stable GitHub Releases trigger publication automatically.
+4. Push this workflow, `apt/install.sh`, and `apt/release.conf` to `main`. The push publishes the latest stable release. You can also go to **Actions → Publish APT repository → Run workflow**, enter `v0.1.0`, and run it manually. Future stable GitHub Releases trigger publication automatically.
 
-5. After the first successful run, verify the published key fingerprint at `https://madabina-com.github.io/madabina-cli/apt-key-fingerprint.txt` and record it in the public installation documentation so users can compare it through an independent trusted channel.
+5. After a successful run, verify `https://packages.madabina.com/apt-key-fingerprint.txt`, `https://packages.madabina.com/install.sh`, and `https://packages.madabina.com/install.sh.sha256`. The installer pins the signing-key fingerprint to `A6561F99594315269612AD984B8D3B0CB32D4F67` before configuring APT.
 
-The Pages site URL is `https://madabina-com.github.io/madabina-cli/`. Do not tell users that `apt install madabina` is available until the initial workflow succeeds and its signed `InRelease` is reachable there.
+The public Pages URL is `https://packages.madabina.com/`. Do not tell users that `apt install madabina` is available until the workflow succeeds and its signed `InRelease` is reachable there.

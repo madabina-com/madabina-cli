@@ -1,6 +1,11 @@
 name: Publish APT repository
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - apt/install.sh
+      - .github/workflows/publish-apt-repository.yml
   release:
     types: [published]
   workflow_dispatch:
@@ -120,7 +125,9 @@ jobs:
             --local-user "$key_id" --armor --detach-sign --output dists/stable/Release.gpg dists/stable/Release
           gpg --batch --export "$fingerprint" > madabina-archive-keyring.gpg
           printf '%s\n' "$fingerprint" > apt-key-fingerprint.txt
-          printf '%s\n' "Madabina CLI APT repository, package version ${VERSION}." > index.html
+          cp "$GITHUB_WORKSPACE/apt/install.sh" install.sh
+          sha256sum install.sh | awk '{ print $1 "  madabina-install.sh" }' > install.sh.sha256
+          printf '%s\n' "Madabina CLI APT repository, package version ${VERSION}. Installer: https://packages.madabina.com/install.sh (SHA-256 manifest: install.sh.sha256)." > index.html
           echo "APT repository metadata signed with fingerprint $fingerprint"
 
       - name: Configure GitHub Pages

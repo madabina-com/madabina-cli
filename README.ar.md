@@ -38,13 +38,28 @@ Start-Process $installer -Wait
 
 ## مستودع APT لأنظمة Debian / Ubuntu
 
-يجري إعداد نشر مستودع APT. بعد نجاح النشر الأول، ثبّت البرنامج بالأوامر التالية:
+#### التثبيت بأمر واحد
+
+على Debian أو Ubuntu بمعماريتي AMD64 أو ARM64، ينزّل هذا الأمر المُثبّت وملف SHA-256 ويتحقق منه قبل تشغيله، ثم يضيف مستودع APT الموقّع ويثبّت Madabina CLI:
 
 ```sh
-curl -fsSL https://madabina-com.github.io/madabina-cli/madabina-archive-keyring.gpg | sudo tee /usr/share/keyrings/madabina-cli-archive-keyring.gpg >/dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://madabina-com.github.io/madabina-cli stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
+d="$(mktemp -d)" && trap 'rm -rf "$d"' EXIT && curl -fsSL https://packages.madabina.com/install.sh -o "$d/madabina-install.sh" && curl -fsSL https://packages.madabina.com/install.sh.sha256 -o "$d/install.sh.sha256" && (cd "$d" && sha256sum -c install.sh.sha256) && bash "$d/madabina-install.sh"
+```
+
+يتحقق المُثبّت من أن بصمة مفتاح APT الذي تم تنزيله تطابق البصمة المثبّتة `A6561F99594315269612AD984B8D3B0CB32D4F67` قبل إضافة المستودع. سيطلب `sudo` عند الحاجة. يتم تنزيل SHA-256 من نطاق HTTPS نفسه؛ وهو يكشف أخطاء النقل لكنه لا يثبت هوية ناشر المُثبّت بشكل مستقل.
+
+#### إعداد APT يدوياً
+
+إذا أردت إعداد APT يدوياً:
+
+```sh
+curl -fsSL https://packages.madabina.com/madabina-archive-keyring.gpg -o /tmp/madabina-archive-keyring.gpg
+fingerprint="$(gpg --batch --show-keys --with-colons /tmp/madabina-archive-keyring.gpg | awk -F: '$1 == "fpr" { print toupper($10); exit }')"
+test "$fingerprint" = 'A6561F99594315269612AD984B8D3B0CB32D4F67' || { echo 'بصمة مفتاح APT غير صحيحة' >&2; exit 1; }
+sudo install -D -m 0644 /tmp/madabina-archive-keyring.gpg /usr/share/keyrings/madabina-cli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://packages.madabina.com stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
 sudo apt update
 sudo apt install madabina
 ```
 
-سيغطي المستودع Debian/Ubuntu بمعماريتي AMD64 وARM64. إلى أن ينجح النشر الأول، ثبّت حزمة `.deb` من [صفحة الإصدارات](https://github.com/madabina-com/madabina-cli/releases). راجع [`apt/SETUP.md`](apt/SETUP.md) لإعداد النشر لأول مرة.
+يغطي المستودع Debian/Ubuntu بمعماريتي AMD64 وARM64. راجع [`apt/SETUP.md`](apt/SETUP.md) لإعداد النشر.

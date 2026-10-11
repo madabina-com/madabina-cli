@@ -10,7 +10,7 @@ The Linux installer was not validated on an actual Linux runtime for this releas
 
 ## Windows installation
 
-Per-user setup installers for Windows x64 and ARM64 are being attached to v0.1.0. Once the `*_setup.exe` files appear on the release page, use PowerShell to download the installer and checksum manifest, verify SHA-256, and launch it:
+Per-user setup installers for Windows x64 and ARM64 are available on the [v0.1.0 release page](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0). Use PowerShell to download the installer and checksum manifest, verify SHA-256, and launch it:
 
 ```powershell
 $version = '0.1.0'; $arch = 'amd64' # use 'arm64' for Windows ARM64
@@ -38,13 +38,28 @@ Version `v0.1.0` includes Windows, Linux, and macOS on AMD64 and ARM64, plus Deb
 
 ## Debian / Ubuntu APT repository
 
-APT repository publication is being configured. After the first successful deployment, install with:
+### One-command installer
+
+On Debian or Ubuntu (AMD64 or ARM64), this single command downloads the installer and its SHA-256 manifest, checks the file before running it, then adds the signed APT source and installs Madabina CLI:
 
 ```sh
-curl -fsSL https://madabina-com.github.io/madabina-cli/madabina-archive-keyring.gpg | sudo tee /usr/share/keyrings/madabina-cli-archive-keyring.gpg >/dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://madabina-com.github.io/madabina-cli stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
+d="$(mktemp -d)" && trap 'rm -rf "$d"' EXIT && curl -fsSL https://packages.madabina.com/install.sh -o "$d/madabina-install.sh" && curl -fsSL https://packages.madabina.com/install.sh.sha256 -o "$d/install.sh.sha256" && (cd "$d" && sha256sum -c install.sh.sha256) && bash "$d/madabina-install.sh"
+```
+
+The installer checks that the downloaded APT signing key has the pinned fingerprint `A6561F99594315269612AD984B8D3B0CB32D4F67` before configuring the repository. It asks for `sudo` when required. The SHA-256 manifest is served from the same HTTPS domain, so it detects transfer errors but does not independently authenticate the installer publisher.
+
+### Manual APT setup
+
+If you prefer configuring APT yourself, use:
+
+```sh
+curl -fsSL https://packages.madabina.com/madabina-archive-keyring.gpg -o /tmp/madabina-archive-keyring.gpg
+fingerprint="$(gpg --batch --show-keys --with-colons /tmp/madabina-archive-keyring.gpg | awk -F: '$1 == "fpr" { print toupper($10); exit }')"
+test "$fingerprint" = 'A6561F99594315269612AD984B8D3B0CB32D4F67' || { echo 'APT signing key fingerprint mismatch' >&2; exit 1; }
+sudo install -D -m 0644 /tmp/madabina-archive-keyring.gpg /usr/share/keyrings/madabina-cli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://packages.madabina.com stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
 sudo apt update
 sudo apt install madabina
 ```
 
-The repository covers Debian/Ubuntu AMD64 and ARM64. Until the first deployment succeeds, install the `.deb` package from the [releases page](https://github.com/madabina-com/madabina-cli/releases) instead. See [`apt/SETUP.md`](apt/SETUP.md) for the one-time publisher setup.
+The repository covers Debian/Ubuntu AMD64 and ARM64. See [`apt/SETUP.md`](apt/SETUP.md) for publisher configuration.

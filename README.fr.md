@@ -10,7 +10,7 @@ L’installateur Linux n’a pas été validé sur un véritable environnement L
 
 ## Installation Windows
 
-Les installateurs utilisateur pour Windows x64 et ARM64 sont en cours d’ajout à la release v0.1.0. Dès que les fichiers `*_setup.exe` seront visibles sur la page de release, utilisez PowerShell pour télécharger l’installateur et le manifeste de checksums, vérifier SHA-256, puis le lancer :
+Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.1.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0). Utilisez PowerShell pour télécharger l’installateur et le manifeste de checksums, vérifier SHA-256, puis le lancer :
 
 ```powershell
 $version = '0.1.0'; $arch = 'amd64' # utiliser 'arm64' pour Windows ARM64
@@ -38,13 +38,28 @@ La version `v0.1.0` inclut Windows, Linux et macOS en AMD64 et ARM64, ainsi que 
 
 ## Dépôt APT Debian / Ubuntu
 
-La publication du dépôt APT est en cours de configuration. Après son premier déploiement réussi, installez le CLI ainsi :
+#### Installation en une commande
+
+Sur Debian ou Ubuntu AMD64/ARM64, cette commande télécharge l’installateur et son manifeste SHA-256, vérifie le fichier, puis configure la source APT signée et installe Madabina CLI :
 
 ```sh
-curl -fsSL https://madabina-com.github.io/madabina-cli/madabina-archive-keyring.gpg | sudo tee /usr/share/keyrings/madabina-cli-archive-keyring.gpg >/dev/null
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://madabina-com.github.io/madabina-cli stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
+d="$(mktemp -d)" && trap 'rm -rf "$d"' EXIT && curl -fsSL https://packages.madabina.com/install.sh -o "$d/madabina-install.sh" && curl -fsSL https://packages.madabina.com/install.sh.sha256 -o "$d/install.sh.sha256" && (cd "$d" && sha256sum -c install.sh.sha256) && bash "$d/madabina-install.sh"
+```
+
+L’installateur vérifie que la clé APT téléchargée possède l’empreinte épinglée `A6561F99594315269612AD984B8D3B0CB32D4F67` avant d’ajouter le dépôt. Il demande `sudo` lorsque nécessaire. Le SHA-256 vient du même domaine HTTPS : il détecte les erreurs de transfert, mais n’authentifie pas indépendamment l’éditeur du script.
+
+#### Configuration APT manuelle
+
+Si vous préférez configurer APT vous-même :
+
+```sh
+curl -fsSL https://packages.madabina.com/madabina-archive-keyring.gpg -o /tmp/madabina-archive-keyring.gpg
+fingerprint="$(gpg --batch --show-keys --with-colons /tmp/madabina-archive-keyring.gpg | awk -F: '$1 == "fpr" { print toupper($10); exit }')"
+test "$fingerprint" = 'A6561F99594315269612AD984B8D3B0CB32D4F67' || { echo 'Empreinte de clé APT incorrecte' >&2; exit 1; }
+sudo install -D -m 0644 /tmp/madabina-archive-keyring.gpg /usr/share/keyrings/madabina-cli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://packages.madabina.com stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
 sudo apt update
 sudo apt install madabina
 ```
 
-Le dépôt couvrira Debian/Ubuntu AMD64 et ARM64. Tant que son premier déploiement n’a pas réussi, installez plutôt le paquet `.deb` depuis la [page des releases](https://github.com/madabina-com/madabina-cli/releases). Consultez [`apt/SETUP.md`](apt/SETUP.md) pour la configuration initiale côté éditeur.
+Le dépôt couvre Debian/Ubuntu AMD64 et ARM64. Consultez [`apt/SETUP.md`](apt/SETUP.md) pour la configuration de publication.
