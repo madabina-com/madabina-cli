@@ -1,5 +1,4 @@
-# This repository contains release documentation and notices only.
-# Publish versioned archives and packages as GitHub Release assets, not Git blobs.
+# Ignore generated files except versioned binary payloads used by the tag-release workflow.
 *
 !.gitignore
 !README.md
@@ -9,3 +8,8 @@
 !THIRD_PARTY_NOTICES.md
 !third_party_licenses/
 !third_party_licenses/**
+!.github/
+!.github/workflows/
+!.github/workflows/publish-binary-release.yml
+!release-assets/
+!release-assets/**
