@@ -1,0 +1,119 @@
+name: Publish npm packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub Release tag (for example v0.1.1)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish-platform:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            asset: madabina_{version}_linux_amd64.tar.gz
+          - target: linux-arm64
+            asset: madabina_{version}_linux_arm64.tar.gz
+          - target: darwin-x64
+            asset: madabina_{version}_darwin_amd64.tar.gz
+          - target: darwin-arm64
+            asset: madabina_{version}_darwin_arm64.tar.gz
+          - target: win32-x64
+            asset: madabina_{version}_windows_amd64.zip
+          - target: win32-arm64
+            asset: madabina_{version}_windows_arm64.zip
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Validate release tag and npm token
+        id: release
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "Invalid release tag: $RELEASE_TAG" >&2; exit 1; }
+          [[ -n "$NPM_TOKEN" ]] || { echo 'Configure the NPM_TOKEN Actions secret before publishing.' >&2; exit 1; }
+          echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${RELEASE_TAG#v}" >> "$GITHUB_OUTPUT"
+      - name: Download release archive and checksum manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          ASSET_TEMPLATE: ${{ matrix.asset }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/madabina-assets"
+          asset="${ASSET_TEMPLATE//\{version\}/$VERSION}"
+          gh release download "$RELEASE_TAG" --repo madabina-com/madabina-cli --pattern "$asset" --pattern checksums.txt --dir "$RUNNER_TEMP/madabina-assets"
+          test -s "$RUNNER_TEMP/madabina-assets/$asset"
+          test -s "$RUNNER_TEMP/madabina-assets/checksums.txt"
+      - name: Assemble verified platform package
+        id: package
+        env:
+          ASSET_TEMPLATE: ${{ matrix.asset }}
+          VERSION: ${{ steps.release.outputs.version }}
+          TARGET: ${{ matrix.target }}
+        shell: bash
+        run: |
+          asset="${ASSET_TEMPLATE//\{version\}/$VERSION}"
+          package_dir="$(python scripts/prepare-npm-release.py platform --version "$VERSION" --target "$TARGET" --asset "$RUNNER_TEMP/madabina-assets/$asset" --checksums "$RUNNER_TEMP/madabina-assets/checksums.txt" --output "$RUNNER_TEMP/npm-packages")"
+          echo "directory=$package_dir" >> "$GITHUB_OUTPUT"
+      - name: Publish platform package
+        working-directory: ${{ steps.package.outputs.directory }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
+
+  publish-launcher:
+    needs: publish-platform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Validate release tag and npm token
+        id: release
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "Invalid release tag: $RELEASE_TAG" >&2; exit 1; }
+          [[ -n "$NPM_TOKEN" ]] || { echo 'Configure the NPM_TOKEN Actions secret before publishing.' >&2; exit 1; }
+          echo "version=${RELEASE_TAG#v}" >> "$GITHUB_OUTPUT"
+      - name: Assemble launcher package
+        id: package
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          package_dir="$(python scripts/prepare-npm-release.py launcher --version "$VERSION" --output "$RUNNER_TEMP/npm-packages")"
+          echo "directory=$package_dir" >> "$GITHUB_OUTPUT"
+      - name: Publish launcher package
+        working-directory: ${{ steps.package.outputs.directory }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish

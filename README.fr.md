@@ -8,6 +8,10 @@ Madabina CLI `v0.1.0` était la première release officielle des binaires; `v0.1
 
 Les binaires Linux et macOS `v0.1.1` ont été compilés pour ces plateformes, mais n’y ont pas été exécutés. Consultez les notes de release avant l’installation. N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
 
+## Installation npm (en préparation)
+
+Le paquet npm `madabina-cli` est en préparation. Après sa première publication, installez Madabina CLI avec `npm install --global madabina-cli`, puis vérifiez avec `madabina --version`. npm sélectionnera un binaire original vérifié pour Windows, Linux ou macOS, en x64 ou ARM64. L’installation npm n’est pas encore disponible. Consultez [`npm/README.md`](npm/README.md) pour la configuration de publication.
+
 ## Installation Windows
 
 Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.1.1](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.1).
