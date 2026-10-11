@@ -10,7 +10,7 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 ## التثبيت عبر npm (قيد الإعداد)
 
-يجري إعداد حزمة npm باسم `madabina-cli`. بعد نشرها لأول مرة، ثبّت Madabina CLI باستخدام `npm install --global madabina-cli`، ثم تحقق بالأمر `madabina --version`. سيختار npm الملف التنفيذي الأصلي المناسب لنظام Windows أو Linux أو macOS بمعمارية x64 أو ARM64. التثبيت عبر npm غير متاح بعد. راجع [`npm/README.md`](npm/README.md) لإعداد النشر.
+تم إرسال إصدار npm `v0.1.1` من `madabina-cli` وحزم المنصات إلى npm، وهي بانتظار المراجعة والموافقة. التثبيت عبر npm غير متاح حالياً. بعد الموافقة، ثبّت باستخدام `npm install --global madabina-cli`، ثم تحقق بالأمر `madabina --version`. ستدعم حزم npm نظامي Linux وmacOS بمعماريتي x64 وARM64، إضافة إلى Windows ARM64. يظل Windows x64 متاحاً عبر مُثبّتات إصدار GitHub. لا يشمل ذلك Termux/Android. راجع [`npm/README.md`](npm/README.md) لمعرفة حالة التثبيت والمنصات المدعومة.
 
 ## التثبيت على Windows
 
