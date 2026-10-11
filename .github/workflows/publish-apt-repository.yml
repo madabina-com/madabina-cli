@@ -59,6 +59,12 @@ jobs:
         run: |
           set -euo pipefail
           tag="${RELEASE_EVENT_TAG:-$DISPATCH_TAG}"
+          if [[ -z "$tag" ]]; then
+            stable_tags="$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1000 \
+              --json tagName,isDraft,isPrerelease \
+              --jq '[.[] | select(.isDraft == false and .isPrerelease == false and (.tagName | test("^v[0-9]+\\.[0-9]+\\.[0-9]+$"))) | .tagName] | .[]')"
+            tag="$(printf '%s\n' "$stable_tags" | sort -V | tail -n 1)"
+          fi
           [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected a stable vX.Y.Z tag, got: $tag" >&2; exit 1; }
           version="${tag#v}"
           mkdir -p "$RUNNER_TEMP/madabina-debs"
