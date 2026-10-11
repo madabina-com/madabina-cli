@@ -11,5 +11,8 @@
 !.github/
 !.github/workflows/
 !.github/workflows/publish-binary-release.yml
+!.github/workflows/publish-apt-repository.yml
+!apt/
+!apt/**
 !release-assets/
 !release-assets/**

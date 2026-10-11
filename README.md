@@ -17,3 +17,16 @@ Third-party components remain subject to their own license terms, included under
 ## Supported release targets
 
 Version `v0.1.0` includes Windows, Linux, and macOS on AMD64 and ARM64, plus Debian packages for AMD64 and ARM64. Android/Termux ARM64 is planned for a later release.
+
+## Debian / Ubuntu APT repository
+
+APT repository publication is being configured. After the first successful deployment, install with:
+
+```sh
+curl -fsSL https://madabina-com.github.io/madabina-cli/madabina-archive-keyring.gpg | sudo tee /usr/share/keyrings/madabina-cli-archive-keyring.gpg >/dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://madabina-com.github.io/madabina-cli stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
+sudo apt update
+sudo apt install madabina
+```
+
+The repository covers Debian/Ubuntu AMD64 and ARM64. Until the first deployment succeeds, install the `.deb` package from the [releases page](https://github.com/madabina-com/madabina-cli/releases) instead. See [`apt/SETUP.md`](apt/SETUP.md) for the one-time publisher setup.

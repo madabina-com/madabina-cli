@@ -1,0 +1,136 @@
+name: Publish APT repository
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub Release tag to publish, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: madabina-apt-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out distribution repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate signing configuration
+        shell: bash
+        env:
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_SIGNING_KEY_PASSPHRASE: ${{ secrets.APT_SIGNING_KEY_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          test -n "$APT_SIGNING_KEY" || { echo 'Missing APT_SIGNING_KEY repository secret' >&2; exit 1; }
+          test -n "$APT_SIGNING_KEY_PASSPHRASE" || { echo 'Missing APT_SIGNING_KEY_PASSPHRASE repository secret' >&2; exit 1; }
+
+      - name: Install Debian repository tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes apt-utils gnupg
+
+      - name: Download and verify Debian packages from stable releases
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
+          DISPATCH_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${RELEASE_EVENT_TAG:-$DISPATCH_TAG}"
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Expected a stable vX.Y.Z tag, got: $tag" >&2; exit 1; }
+          version="${tag#v}"
+          mkdir -p "$RUNNER_TEMP/madabina-debs"
+          mapfile -t tags < <(gh release list --repo "$GITHUB_REPOSITORY" --limit 1000 \
+            --json tagName,isDraft,isPrerelease \
+            --jq '.[] | select(.isDraft == false and .isPrerelease == false) | .tagName')
+          found_requested_tag=false
+          for release_tag in "${tags[@]}"; do
+            [[ "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || continue
+            release_version="${release_tag#v}"
+            release_dir="$RUNNER_TEMP/madabina-debs/$release_version"
+            mkdir -p "$release_dir"
+            gh release download "$release_tag" --repo "$GITHUB_REPOSITORY" \
+              --pattern "madabina_${release_version}_amd64.deb" \
+              --pattern "madabina_${release_version}_arm64.deb" \
+              --pattern checksums.txt \
+              --dir "$release_dir"
+            cd "$release_dir"
+            for arch in amd64 arm64; do
+              package="madabina_${release_version}_${arch}.deb"
+              test -f "$package"
+              grep -F "  $package" checksums.txt | sha256sum --check --status
+              test "$(dpkg-deb -f "$package" Package)" = madabina
+              test "$(dpkg-deb -f "$package" Version)" = "$release_version"
+              test "$(dpkg-deb -f "$package" Architecture)" = "$arch"
+              mkdir -p "$RUNNER_TEMP/madabina-debs/pool/$arch"
+              cp "$package" "$RUNNER_TEMP/madabina-debs/pool/$arch/"
+            done
+            if [[ "$release_tag" == "$tag" ]]; then found_requested_tag=true; fi
+          done
+          test "$found_requested_tag" = true || { echo "Release $tag was not found among published stable releases" >&2; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build and sign APT repository
+        shell: bash
+        env:
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_SIGNING_KEY_PASSPHRASE: ${{ secrets.APT_SIGNING_KEY_PASSPHRASE }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          printf '%s\n' "$APT_SIGNING_KEY" | gpg --batch --import
+          key_id="$(gpg --batch --with-colons --list-secret-keys | awk -F: '$1 == "sec" { print $5; exit }')"
+          test -n "$key_id" || { echo 'No private signing key was imported' >&2; exit 1; }
+          fingerprint="$(gpg --batch --with-colons --fingerprint "$key_id" | awk -F: '$1 == "fpr" { print $10; exit }')"
+          test -n "$fingerprint"
+
+          site="$RUNNER_TEMP/apt-site"
+          mkdir -p "$site/pool/main/m/madabina/amd64" "$site/pool/main/m/madabina/arm64" \
+            "$site/dists/stable/main/binary-amd64" "$site/dists/stable/main/binary-arm64"
+          cp "$RUNNER_TEMP/madabina-debs/pool/amd64/"*.deb "$site/pool/main/m/madabina/amd64/"
+          cp "$RUNNER_TEMP/madabina-debs/pool/arm64/"*.deb "$site/pool/main/m/madabina/arm64/"
+
+          cd "$site"
+          apt-ftparchive packages pool/main/m/madabina/amd64 > dists/stable/main/binary-amd64/Packages
+          apt-ftparchive packages pool/main/m/madabina/arm64 > dists/stable/main/binary-arm64/Packages
+          gzip --no-name --best --stdout dists/stable/main/binary-amd64/Packages > dists/stable/main/binary-amd64/Packages.gz
+          gzip --no-name --best --stdout dists/stable/main/binary-arm64/Packages > dists/stable/main/binary-arm64/Packages.gz
+          apt-ftparchive -c "$GITHUB_WORKSPACE/apt/release.conf" release dists/stable > dists/stable/Release
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$APT_SIGNING_KEY_PASSPHRASE" \
+            --local-user "$key_id" --clearsign --output dists/stable/InRelease dists/stable/Release
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$APT_SIGNING_KEY_PASSPHRASE" \
+            --local-user "$key_id" --armor --detach-sign --output dists/stable/Release.gpg dists/stable/Release
+          gpg --batch --export "$fingerprint" > madabina-archive-keyring.gpg
+          printf '%s\n' "$fingerprint" > apt-key-fingerprint.txt
+          printf '%s\n' "Madabina CLI APT repository, package version ${VERSION}." > index.html
+          echo "APT repository metadata signed with fingerprint $fingerprint"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload APT repository as Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/apt-site
+
+      - name: Deploy APT repository
+        id: deployment
+        uses: actions/deploy-pages@v4

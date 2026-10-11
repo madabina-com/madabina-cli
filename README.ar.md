@@ -17,3 +17,16 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 ## الأنظمة المستهدفة
 
 يتضمن الإصدار `v0.1.0` أنظمة Windows وLinux وmacOS بمعماريتي AMD64 وARM64، بالإضافة إلى حزم Debian بمعماريتي AMD64 وARM64. سيُضاف Android/Termux ARM64 في إصدار لاحق.
+
+## مستودع APT لأنظمة Debian / Ubuntu
+
+يجري إعداد نشر مستودع APT. بعد نجاح النشر الأول، ثبّت البرنامج بالأوامر التالية:
+
+```sh
+curl -fsSL https://madabina-com.github.io/madabina-cli/madabina-archive-keyring.gpg | sudo tee /usr/share/keyrings/madabina-cli-archive-keyring.gpg >/dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/madabina-cli-archive-keyring.gpg] https://madabina-com.github.io/madabina-cli stable main" | sudo tee /etc/apt/sources.list.d/madabina-cli.list >/dev/null
+sudo apt update
+sudo apt install madabina
+```
+
+سيغطي المستودع Debian/Ubuntu بمعماريتي AMD64 وARM64. إلى أن ينجح النشر الأول، ثبّت حزمة `.deb` من [صفحة الإصدارات](https://github.com/madabina-com/madabina-cli/releases). راجع [`apt/SETUP.md`](apt/SETUP.md) لإعداد النشر لأول مرة.
