@@ -25,6 +25,7 @@ ShowUnInstDetails show
 !include "StrFunc.nsh"
 ${StrStr}
 ${StrRep}
+${UnStrRep}
 
 !define MUI_ABORTWARNING
 !define MUI_LICENSEPAGE_TEXT_TOP "Please review the Madabina CLI binary license."
@@ -71,9 +72,9 @@ SectionEnd
 Section "Uninstall"
   SetShellVarContext current
   ReadRegStr $0 HKCU "Environment" "Path"
-  ${StrRep} $0 "$0" ";$INSTDIR" ""
-  ${StrRep} $0 "$0" "$INSTDIR;" ""
-  ${StrRep} $0 "$0" "$INSTDIR" ""
+  ${UnStrRep} $0 "$0" ";$INSTDIR" ""
+  ${UnStrRep} $0 "$0" "$INSTDIR;" ""
+  ${UnStrRep} $0 "$0" "$INSTDIR" ""
   WriteRegExpandStr HKCU "Environment" "Path" "$0"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\MadabinaCLI"
   Delete "$INSTDIR\madabina.exe"
