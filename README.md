@@ -4,9 +4,9 @@ Madabina CLI is proprietary software distributed by Madabina LLC. This repositor
 
 ## Release status
 
-No versioned public release is available yet. Official versioned downloads will appear on the [Madabina CLI Releases page](https://github.com/madabina-com/madabina-cli/releases). Do not install or redistribute files marked `SNAPSHOT`; they are local validation candidates, not official releases.
+Madabina CLI `v0.1.0` is the first official binary release. Download the versioned archives, Debian packages, and SHA-256 manifest from the [Madabina CLI Releases page](https://github.com/madabina-com/madabina-cli/releases). Choose the package for your operating system and CPU architecture, then verify its checksum before installing it. A checksum downloaded from the same release confirms transfer integrity; it does not independently authenticate the publisher.
 
-When an official release is published, its versioned archives, Debian packages, and SHA-256 manifest will be attached to that release. Choose the package for your operating system and CPU architecture, then verify its checksum before installing it. A checksum downloaded from the same release confirms transfer integrity; it does not independently authenticate the publisher.
+The Linux installer was not validated on an actual Linux runtime for this release. See the release notes before installing. Do not install or redistribute files marked `SNAPSHOT`; they are local validation candidates, not official releases.
 
 ## License and notices
 
@@ -16,4 +16,4 @@ Third-party components remain subject to their own license terms, included under
 
 ## Supported release targets
 
-Planned targets are Windows, Linux, and macOS on AMD64 and ARM64, Debian packages for supported Linux architectures, and a separate Android/Termux ARM64 archive. A target is supported only when included in a published release.
+Version `v0.1.0` includes Windows, Linux, and macOS on AMD64 and ARM64, plus Debian packages for AMD64 and ARM64. Android/Termux ARM64 is planned for a later release.
