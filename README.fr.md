@@ -4,13 +4,13 @@ Madabina CLI est un logiciel propriétaire distribué par Madabina LLC. Ce dép�
 
 ## État des releases
 
-Madabina CLI `v0.1.0` est la première release officielle des binaires. Téléchargez les archives versionnées, les paquets Debian et le manifeste SHA-256 depuis la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
+Madabina CLI `v0.1.0` était la première release officielle des binaires; `v0.1.1` est la version la plus récente. Téléchargez les archives versionnées, les paquets Debian et le manifeste SHA-256 depuis la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
 
-L’installateur Linux n’a pas été validé sur un véritable environnement Linux pour cette release. Consultez les notes de release avant l’installation. N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
+Les binaires Linux et macOS `v0.1.1` ont été compilés pour ces plateformes, mais n’y ont pas été exécutés. Consultez les notes de release avant l’installation. N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
 
 ## Installation Windows
 
-Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.1.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0).
+Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.1.1](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.1).
 
 ### Installation en une commande
 
@@ -27,7 +27,7 @@ Le manifeste SHA-256 est hébergé sur le même domaine HTTPS : il détecte les 
 Pour télécharger le setup vous-même, choisissez `amd64` pour Windows x64 ou `arm64` pour Windows ARM64, vérifiez son hash dans `checksums.txt`, puis lancez-le :
 
 ```powershell
-$version = '0.1.0'; $arch = 'amd64' # utiliser 'arm64' pour Windows ARM64
+$version = '0.1.1'; $arch = 'amd64' # utiliser 'arm64' pour Windows ARM64
 $name = "madabina_${version}_windows_${arch}_setup.exe"
 $base = "https://github.com/madabina-com/madabina-cli/releases/download/v$version"
 $checksums = Join-Path $env:TEMP 'madabina-checksums.txt'; $installer = Join-Path $env:TEMP $name

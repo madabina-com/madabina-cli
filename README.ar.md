@@ -4,13 +4,13 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 ## حالة الإصدارات
 
-الإصدار `v0.1.0` هو أول إصدار رسمي لملفات Madabina CLI التنفيذية. نزّل الملفات المضغوطة ذات الأرقام وحزم Debian وملف SHA-256 من [صفحة إصدارات Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). اختر الحزمة المناسبة لنظام التشغيل ومعمارية المعالج، ثم تحقّق من قيمة SHA-256 قبل التثبيت. تؤكد قيمة التحقق التي تُنزّل من الإصدار نفسه سلامة النقل، لكنها لا تثبت هوية الناشر بشكل مستقل.
+كان الإصدار `v0.1.0` أول إصدار رسمي لملفات Madabina CLI التنفيذية، والإصدار `v0.1.1` هو الأحدث. نزّل الملفات المضغوطة ذات الأرقام وحزم Debian وملف SHA-256 من [صفحة إصدارات Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). اختر الحزمة المناسبة لنظام التشغيل ومعمارية المعالج، ثم تحقّق من قيمة SHA-256 قبل التثبيت. تؤكد قيمة التحقق التي تُنزّل من الإصدار نفسه سلامة النقل، لكنها لا تثبت هوية الناشر بشكل مستقل.
 
-لم يتم اختبار مُثبّت Linux على بيئة Linux فعلية لهذا الإصدار. راجع ملاحظات الإصدار قبل التثبيت. لا تثبّت ولا تعِد توزيع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات محلية للاختبار وليست إصدارات رسمية.
+تم تجميع ملفات Linux وmacOS للإصدار `v0.1.1`، لكن لم يتم تشغيلها على هذين النظامين. راجع ملاحظات الإصدار قبل التثبيت. لا تثبّت ولا تعِد توزيع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات محلية للاختبار وليست إصدارات رسمية.
 
 ## التثبيت على Windows
 
-تتوفر مُثبّتات المستخدم لنظام Windows بمعماريتي x64 وARM64 في [صفحة الإصدار v0.1.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.0).
+تتوفر مُثبّتات المستخدم لنظام Windows بمعماريتي x64 وARM64 في [صفحة الإصدار v0.1.1](https://github.com/madabina-com/madabina-cli/releases/tag/v0.1.1).
 
 ### التثبيت بأمر واحد
 
@@ -27,7 +27,7 @@ $d=Join-Path $env:TEMP ('madabina-'+[guid]::NewGuid().ToString('N'));New-Item -I
 لتنزيل ملف التثبيت بنفسك، اختر `amd64` لنظام Windows x64 أو `arm64` لنظام Windows ARM64، وتحقق من قيمته في `checksums.txt` ثم شغّله:
 
 ```powershell
-$version = '0.1.0'; $arch = 'amd64' # استخدم 'arm64' لأجهزة Windows ARM64
+$version = '0.1.1'; $arch = 'amd64' # استخدم 'arm64' لأجهزة Windows ARM64
 $name = "madabina_${version}_windows_${arch}_setup.exe"
 $base = "https://github.com/madabina-com/madabina-cli/releases/download/v$version"
 $checksums = Join-Path $env:TEMP 'madabina-checksums.txt'; $installer = Join-Path $env:TEMP $name
