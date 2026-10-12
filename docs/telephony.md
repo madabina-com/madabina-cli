@@ -1,6 +1,6 @@
 # Asterisk telephony console
 
-Madabina CLI v0.2.0 adds a local Asterisk administration page at `http://127.0.0.1:7410/telephony`. It is intended for the same Ubuntu or Debian host as Asterisk, with systemd. Other operating systems can show that administration is unsupported; remote SSH management is not provided.
+Madabina CLI v0.2.2 adds secure reverse-proxy access to the Asterisk administration page at `/telephony`. The CLI and Asterisk still run on the same Ubuntu or Debian host with systemd; a TLS reverse proxy can expose the page to remote operators. Other operating systems can show that administration is unsupported; remote SSH management is not provided.
 
 ## What the page shows
 
@@ -23,8 +23,29 @@ sudo systemctl enable --now madabina-telephony-helper.service
 
 Sign out and back in after changing group membership, then start `madabina web` and open the page. Check the helper with `systemctl status madabina-telephony-helper.service`; check Asterisk with `systemctl status asterisk.service`. The page remains read-only when the helper is absent or the CLI account cannot access its socket.
 
+## Secure remote access through HTTPS
+
+For access from another device, keep the CLI bound to loopback and put an HTTPS reverse proxy with operator authentication in front of it. Do not expose port 7410 directly to the LAN or Internet. Configure the exact public HTTPS origin:
+
+```sh
+madabina web --trusted-origin https://pbx.example.com
+```
+
+Example Caddy site (generate a password hash with `caddy hash-password` and replace the placeholder):
+
+```caddyfile
+pbx.example.com {
+    basic_auth {
+        operator REPLACE_WITH_CADDY_PASSWORD_HASH
+    }
+    reverse_proxy 127.0.0.1:7410
+}
+```
+
+Keep firewall access to port 7410 restricted to the local machine; allow remote clients to reach only the proxy's HTTPS listener. The proxy must preserve the browser's `Host` header. `--trusted-origin` accepts one exact HTTPS origin and does not enable telephony on a LAN-bound CLI. Protect every route with the proxy's authentication, since the proxy exposes the full console, and use a strong unique operator password. SSH port forwarding remains an option when no HTTPS proxy is available.
+
 ## Security boundary
 
-The helper runs as root because it writes Asterisk configuration and controls the Asterisk service. Its Unix socket is mode `0660`, owned by `root:asterisk`. The helper accepts only fixed status, read-config, apply-config, and start/stop/restart operations; clients cannot supply shell commands, executable paths, or arbitrary file paths. Configuration files are written atomically with restricted permissions. The telephony HTTP API is enabled only when the web server binds to a loopback address, even if other console pages use the explicit LAN bind option.
+The web server must bind to loopback for telephony APIs; remote access is enabled only for the exact HTTPS origin configured with --trusted-origin. Direct LAN binding never enables telephony.
 
-The `asterisk` group membership grants access to telephony administration on that host. Add only trusted operator accounts. Review the changes before applying them and use the `.madabina-backup` files for manual recovery if needed. This feature has not been declared runtime-verified on a host unless that specific Asterisk/systemd/helper combination was exercised.
+The `asterisk` group membership grants access to telephony administration on that host. Add only trusted operator accounts. The HTTPS proxy must authenticate remote users and keep the backend port private. Review changes before applying them and use the `.madabina-backup` files for manual recovery if needed. This feature has not been declared runtime-verified on a host unless that specific Asterisk/systemd/helper combination was exercised.
