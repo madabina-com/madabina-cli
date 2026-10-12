@@ -4,9 +4,9 @@ Madabina CLI est un logiciel propriétaire distribué par Madabina LLC. Ce dép�
 
 ## État des releases
 
-Madabina CLI `v0.2.0` est la dernière version. Téléchargez les archives, paquets Debian, installateurs Windows et manifeste SHA-256 depuis la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
+Madabina CLI `v0.2.1` est la dernière version. Téléchargez les archives, paquets Debian, installateurs Windows et manifeste SHA-256 depuis la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
 
-La version v0.2.0 inclut la console Asterisk locale sur `/telephony`. L’hôte pris en charge est Ubuntu/Debian avec systemd; un helper séparé est requis pour modifier la configuration et piloter le service. Consultez le guide en [français](docs/telephony.fr.md), [anglais](docs/telephony.md) ou [arabe](docs/telephony.ar.md). N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
+La version v0.2.1 inclut la console Asterisk locale sur `/telephony`. L’hôte pris en charge est Ubuntu/Debian avec systemd; un helper séparé est requis pour modifier la configuration et piloter le service. Consultez le guide en [français](docs/telephony.fr.md), [anglais](docs/telephony.md) ou [arabe](docs/telephony.ar.md). N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
 
 ## Installation npm (en attente d’approbation)
 
@@ -14,7 +14,7 @@ La release npm `v0.1.1` de `madabina-cli` et ses paquets de plateformes ont ét�
 
 ## Installation Windows
 
-Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.2.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.2.0).
+Les installateurs utilisateur pour Windows x64 et ARM64 sont disponibles sur la [page de release v0.2.1](https://github.com/madabina-com/madabina-cli/releases/tag/v0.2.1).
 
 ### Installation en une commande
 
@@ -31,7 +31,7 @@ Le manifeste SHA-256 est hébergé sur le même domaine HTTPS : il détecte les 
 Pour télécharger le setup vous-même, choisissez `amd64` pour Windows x64 ou `arm64` pour Windows ARM64, vérifiez son hash dans `checksums.txt`, puis lancez-le :
 
 ```powershell
-$version = '0.2.0'; $arch = 'amd64' # utiliser 'arm64' pour Windows ARM64
+$version = '0.2.1'; $arch = 'amd64' # utiliser 'arm64' pour Windows ARM64
 $name = "madabina_${version}_windows_${arch}_setup.exe"
 $base = "https://github.com/madabina-com/madabina-cli/releases/download/v$version"
 $checksums = Join-Path $env:TEMP 'madabina-checksums.txt'; $installer = Join-Path $env:TEMP $name
@@ -52,7 +52,7 @@ Les composants tiers restent soumis à leurs propres licences, disponibles dans 
 
 ## Cibles prévues
 
-La version `v0.2.0` inclut Windows, Linux et macOS en AMD64 et ARM64, ainsi que des paquets Debian en AMD64 et ARM64. Android/Termux ARM64 est prévu dans une prochaine release.
+La version `v0.2.1` inclut Windows, Linux et macOS en AMD64 et ARM64, ainsi que des paquets Debian en AMD64 et ARM64. Android/Termux ARM64 est prévu dans une prochaine release.
 
 ## Dépôt APT Debian / Ubuntu
 

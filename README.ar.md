@@ -4,9 +4,9 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 ## حالة الإصدارات
 
-الإصدار `v0.2.0` هو أحدث إصدارات Madabina CLI. نزّل الملفات المضغوطة وحزم Debian ومثبتات Windows وملف SHA-256 من [صفحة الإصدارات](https://github.com/madabina-com/madabina-cli/releases). اختر الحزمة المناسبة لنظام التشغيل والمعمارية، ثم تحقّق من SHA-256 قبل التثبيت. تؤكد قيمة التحقق من الإصدار نفسه سلامة النقل، لكنها لا تثبت هوية الناشر بشكل مستقل.
+الإصدار `v0.2.1` هو أحدث إصدارات Madabina CLI. نزّل الملفات المضغوطة وحزم Debian ومثبتات Windows وملف SHA-256 من [صفحة الإصدارات](https://github.com/madabina-com/madabina-cli/releases). اختر الحزمة المناسبة لنظام التشغيل والمعمارية، ثم تحقّق من SHA-256 قبل التثبيت. تؤكد قيمة التحقق من الإصدار نفسه سلامة النقل، لكنها لا تثبت هوية الناشر بشكل مستقل.
 
-يتضمن الإصدار v0.2.0 وحدة Asterisk محلية على `/telephony`. النظام المدعوم هو Ubuntu/Debian مع systemd؛ ويلزم تثبيت مساعد منفصل لتعديل الإعدادات والتحكم بالخدمة. اقرأ الدليل [بالعربية](docs/telephony.ar.md) أو [الفرنسية](docs/telephony.fr.md) أو [الإنجليزية](docs/telephony.md). لا تثبّت ولا توزّع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات اختبار محلية وليست إصدارات رسمية.
+يتضمن الإصدار v0.2.1 وحدة Asterisk محلية على `/telephony`. النظام المدعوم هو Ubuntu/Debian مع systemd؛ ويلزم تثبيت مساعد منفصل لتعديل الإعدادات والتحكم بالخدمة. اقرأ الدليل [بالعربية](docs/telephony.ar.md) أو [الفرنسية](docs/telephony.fr.md) أو [الإنجليزية](docs/telephony.md). لا تثبّت ولا توزّع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات اختبار محلية وليست إصدارات رسمية.
 
 ## التثبيت عبر npm (قيد الإعداد)
 
@@ -14,7 +14,7 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 ## التثبيت على Windows
 
-تتوفر مُثبّتات المستخدم لنظام Windows بمعماريتي x64 وARM64 في [صفحة الإصدار v0.2.0](https://github.com/madabina-com/madabina-cli/releases/tag/v0.2.0).
+تتوفر مُثبّتات المستخدم لنظام Windows بمعماريتي x64 وARM64 في [صفحة الإصدار v0.2.1](https://github.com/madabina-com/madabina-cli/releases/tag/v0.2.1).
 
 ### التثبيت بأمر واحد
 
@@ -31,7 +31,7 @@ $d=Join-Path $env:TEMP ('madabina-'+[guid]::NewGuid().ToString('N'));New-Item -I
 لتنزيل ملف التثبيت بنفسك، اختر `amd64` لنظام Windows x64 أو `arm64` لنظام Windows ARM64، وتحقق من قيمته في `checksums.txt` ثم شغّله:
 
 ```powershell
-$version = '0.2.0'; $arch = 'amd64' # استخدم 'arm64' لأجهزة Windows ARM64
+$version = '0.2.1'; $arch = 'amd64' # استخدم 'arm64' لأجهزة Windows ARM64
 $name = "madabina_${version}_windows_${arch}_setup.exe"
 $base = "https://github.com/madabina-com/madabina-cli/releases/download/v$version"
 $checksums = Join-Path $env:TEMP 'madabina-checksums.txt'; $installer = Join-Path $env:TEMP $name
@@ -52,7 +52,7 @@ Start-Process $installer -Wait
 
 ## الأنظمة المستهدفة
 
-يتضمن الإصدار `v0.2.0` أنظمة Windows وLinux وmacOS بمعماريتي AMD64 وARM64، بالإضافة إلى حزم Debian بمعماريتي AMD64 وARM64. سيُضاف Android/Termux ARM64 في إصدار لاحق.
+يتضمن الإصدار `v0.2.1` أنظمة Windows وLinux وmacOS بمعماريتي AMD64 وARM64، بالإضافة إلى حزم Debian بمعماريتي AMD64 وARM64. سيُضاف Android/Termux ARM64 في إصدار لاحق.
 
 ## مستودع APT لأنظمة Debian / Ubuntu
 
