@@ -9,6 +9,9 @@ on:
       - .github/workflows/publish-apt-repository.yml
   release:
     types: [published]
+  workflow_run:
+    workflows: ["Publish binary release"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       tag:
@@ -27,6 +30,7 @@ concurrency:
 
 jobs:
   publish:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'v'))
     runs-on: ubuntu-24.04
     environment:
       name: github-pages
@@ -57,9 +61,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
           DISPATCH_TAG: ${{ inputs.tag }}
+          WORKFLOW_RUN_TAG: ${{ github.event.workflow_run.head_branch }}
         run: |
           set -euo pipefail
           tag="${RELEASE_EVENT_TAG:-$DISPATCH_TAG}"
+          if [[ -z "$tag" ]]; then tag="$WORKFLOW_RUN_TAG"; fi
           if [[ -z "$tag" ]]; then
             stable_tags="$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1000 \
               --json tagName,isDraft,isPrerelease \
