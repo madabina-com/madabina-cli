@@ -4,9 +4,9 @@ Madabina CLI est un logiciel propriétaire distribué par Madabina LLC. Ce dép�
 
 ## État des releases
 
-Madabina CLI `v0.2.2` est la dernière version. Téléchargez les archives, paquets Debian, installateurs Windows et manifeste SHA-256 depuis la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
+Madabina CLI `v0.3.0` est la version actuelle. Téléchargez les archives, paquets Debian, installateurs Windows et manifeste SHA-256 depuis la [page des releases Madabina CLI](https://github.com/madabina-com/madabina-cli/releases). Choisissez le paquet correspondant à votre système et à l’architecture du processeur, puis vérifiez son checksum avant l’installation. Un checksum téléchargé depuis la même release confirme l’intégrité du transfert, mais n’authentifie pas l’éditeur de manière indépendante.
 
-La version v0.2.2 inclut la console Asterisk `/telephony` et l’option `--trusted-origin` pour l’accès distant via un proxy inverse HTTPS authentifié. Le CLI reste lié à loopback; une écoute LAN directe ne permet pas de contrôler Asterisk. L’hôte pris en charge est Ubuntu/Debian avec systemd; un helper séparé est requis pour modifier la configuration et piloter le service. Consultez le guide en [français](docs/telephony.fr.md), [anglais](docs/telephony.md) ou [arabe](docs/telephony.ar.md). N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
+La version v0.3.0 ajoute les installateurs locaux confirmés BIND9, Asterisk et Caddy sur Ubuntu/Debian avec systemd (`madabina install dns|telephony|proxy`). Ces commandes installent et démarrent seulement les paquets ; elles ne configurent pas les zones DNS, le proxy Caddy authentifié ni le service systemd Madabina Web. Consultez le [guide d’installation](docs/installation.fr.md). La version inclut aussi la console Asterisk `/telephony` et l’option `--trusted-origin` pour l’accès distant via un proxy inverse HTTPS authentifié. Le CLI reste lié à loopback; une écoute LAN directe ne permet pas de contrôler Asterisk. L’hôte pris en charge est Ubuntu/Debian avec systemd; un helper séparé est requis pour modifier la configuration et piloter le service. Consultez le guide en [français](docs/telephony.fr.md), [anglais](docs/telephony.md) ou [arabe](docs/telephony.ar.md). N’installez pas et ne redistribuez pas les fichiers marqués `SNAPSHOT` : ce sont des candidats locaux de validation, pas des versions officielles.
 
 ## Installation npm (en attente d’approbation)
 
@@ -52,7 +52,7 @@ Les composants tiers restent soumis à leurs propres licences, disponibles dans 
 
 ## Cibles prévues
 
-La version `v0.2.2` inclut Windows, Linux et macOS en AMD64 et ARM64, ainsi que des paquets Debian en AMD64 et ARM64. Android/Termux ARM64 est prévu dans une prochaine release.
+La version `v0.3.0` inclut Windows, Linux et macOS en AMD64 et ARM64, ainsi que des paquets Debian en AMD64 et ARM64. Android/Termux ARM64 ne fait pas partie de cette version.
 
 ## Dépôt APT Debian / Ubuntu
 

@@ -4,9 +4,9 @@ Madabina CLI برنامج احتكاري توزعه Madabina LLC. هذا الم�
 
 ## حالة الإصدارات
 
-الإصدار `v0.2.2` هو أحدث إصدارات Madabina CLI. نزّل الملفات المضغوطة وحزم Debian ومثبتات Windows وملف SHA-256 من [صفحة الإصدارات](https://github.com/madabina-com/madabina-cli/releases). اختر الحزمة المناسبة لنظام التشغيل والمعمارية، ثم تحقّق من SHA-256 قبل التثبيت. تؤكد قيمة التحقق من الإصدار نفسه سلامة النقل، لكنها لا تثبت هوية الناشر بشكل مستقل.
+الإصدار `v0.3.0` هو الإصدار الحالي. نزّل الملفات المضغوطة وحزم Debian ومثبتات Windows وملف SHA-256 من [صفحة الإصدارات](https://github.com/madabina-com/madabina-cli/releases). اختر الحزمة المناسبة لنظام التشغيل والمعمارية، ثم تحقّق من SHA-256 قبل التثبيت. تؤكد قيمة التحقق من الإصدار نفسه سلامة النقل، لكنها لا تثبت هوية الناشر بشكل مستقل.
 
-يتضمن الإصدار v0.2.2 واجهة Asterisk على `/telephony` والخيار `--trusted-origin` للوصول عن بُعد عبر وكيل HTTPS موثّق. يبقى CLI مرتبطاً بـ loopback؛ ولا يتيح ربط LAN المباشر التحكم في Asterisk. النظام المدعوم هو Ubuntu/Debian مع systemd، ويلزم مساعد منفصل لتعديل الإعدادات والتحكم بالخدمة. اقرأ الدليل [بالعربية](docs/telephony.ar.md) أو [الفرنسية](docs/telephony.fr.md) أو [الإنجليزية](docs/telephony.md). لا تثبّت ولا توزّع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات اختبار محلية وليست إصدارات رسمية.
+يضيف الإصدار v0.3.0 أدوات التثبيت المحلية المؤكدة لحزم BIND9 وAsterisk وCaddy على Ubuntu/Debian مع systemd (`madabina install dns|telephony|proxy`). تقتصر هذه الأوامر على تثبيت الحزم وتشغيلها؛ ولا تُعدّ مناطق DNS أو إعداد Caddy موثقاً أو خدمة Madabina Web. راجع [دليل التثبيت](docs/installation.ar.md). ويتضمن الإصدار واجهة Asterisk على `/telephony` والخيار `--trusted-origin` للوصول عن بُعد عبر وكيل HTTPS موثّق. يبقى CLI مرتبطاً بـ loopback؛ ولا يتيح ربط LAN المباشر التحكم في Asterisk. النظام المدعوم هو Ubuntu/Debian مع systemd، ويلزم مساعد منفصل لتعديل الإعدادات والتحكم بالخدمة. اقرأ الدليل [بالعربية](docs/telephony.ar.md) أو [الفرنسية](docs/telephony.fr.md) أو [الإنجليزية](docs/telephony.md). لا تثبّت ولا توزّع الملفات التي تحمل العلامة `SNAPSHOT`؛ فهي ملفات اختبار محلية وليست إصدارات رسمية.
 
 ## التثبيت عبر npm (قيد الإعداد)
 
@@ -52,7 +52,7 @@ Start-Process $installer -Wait
 
 ## الأنظمة المستهدفة
 
-يتضمن الإصدار `v0.2.2` أنظمة Windows وLinux وmacOS بمعماريتي AMD64 وARM64، بالإضافة إلى حزم Debian بمعماريتي AMD64 وARM64. سيُضاف Android/Termux ARM64 في إصدار لاحق.
+يتضمن الإصدار `v0.3.0` أنظمة Windows وLinux وmacOS بمعماريتي AMD64 وARM64، بالإضافة إلى حزم Debian بمعماريتي AMD64 وARM64. لا يتضمن هذا الإصدار Android/Termux ARM64.
 
 ## مستودع APT لأنظمة Debian / Ubuntu
 
