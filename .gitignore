@@ -24,3 +24,5 @@
 !apt/**
 !release-assets/
 !release-assets/**
+!docs/
+!docs/**
