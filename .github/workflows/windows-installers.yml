@@ -9,6 +9,9 @@ on:
       - scripts/build-windows-installers.ps1
   release:
     types: [published]
+  workflow_run:
+    workflows: ["Publish binary release"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       tag:
@@ -20,12 +23,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: windows-installers-${{ inputs.tag || github.event.release.tag_name }}
+  group: windows-installers-${{ inputs.tag || github.event.release.tag_name || github.event.workflow_run.head_branch }}
   cancel-in-progress: false
 
 jobs:
   build-and-upload:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')) || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'v'))
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,9 +54,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
           DISPATCH_TAG: ${{ inputs.tag }}
+          WORKFLOW_RUN_TAG: ${{ github.event.workflow_run.head_branch }}
         run: |
           $tag = $env:DISPATCH_TAG
           if (-not $tag) { $tag = $env:RELEASE_EVENT_TAG }
+          if (-not $tag) { $tag = $env:WORKFLOW_RUN_TAG }
           if (-not $tag) {
             $releases = gh release list --repo $env:GITHUB_REPOSITORY --limit 100 --json tagName,isDraft,isPrerelease | ConvertFrom-Json
             if ($LASTEXITCODE -ne 0) { throw 'Could not list published releases.' }
